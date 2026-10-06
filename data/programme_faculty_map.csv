@@ -1,0 +1,35 @@
+programme_code,programme_name,faculty_code,department_code,department_name,duration_years
+ADM702,ADM702 Undergraduate Programme,EMS,BUS,Business and Economics,3
+AGR600,AGR600 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BAG701,BAG701 Undergraduate Programme,HUM,HUM,Humanities,3
+BCA701,BCA701 Undergraduate Programme,EMS,BUS,Business and Economics,3
+BCE701,BCE701 Undergraduate Programme,EMS,BUS,Business and Economics,3
+BSC705,BSC705 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BSC706,BSC706 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BSC707,BSC707 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BSC708,BSC708 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BSC761,BSC761 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BSC762,BSC762 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BSC763,BSC763 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BSC764,BSC764 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BSC765,BSC765 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BSC766,BSC766 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+BSSC766,BSSC766 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+DSC702,DSC702 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+EDU720,EDU720 Undergraduate Programme,EDU,EDU,Education,4
+EDU723,EDU723 Undergraduate Programme,EDU,EDU,Education,4
+EDU724,EDU724 Undergraduate Programme,EDU,EDU,Education,4
+EDU731,EDU731 Undergraduate Programme,EDU,EDU,Education,4
+EDU732,EDU732 Undergraduate Programme,EDU,EDU,Education,4
+EDU734,EDU734 Undergraduate Programme,EDU,EDU,Education,4
+EDU735,EDU735 Undergraduate Programme,EDU,EDU,Education,4
+EDU738,EDU738 Undergraduate Programme,EDU,EDU,Education,4
+EDU740,EDU740 Undergraduate Programme,EDU,EDU,Education,4
+EDU741,EDU741 Undergraduate Programme,EDU,EDU,Education,4
+EDU742,EDU742 Undergraduate Programme,EDU,EDU,Education,4
+EDU743,EDU743 Undergraduate Programme,EDU,EDU,Education,4
+HCI500,HCI500 Undergraduate Programme,HUM,HUM,Humanities,3
+HER501,HER501 Undergraduate Programme,HUM,HUM,Humanities,3
+ICT602,ICT602 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+ICT701,ICT701 Undergraduate Programme,NAS,SCI,Natural and Applied Sciences,3
+RBM601,RBM601 Undergraduate Programme,EMS,BUS,Business and Economics,3

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>SPU campus timetable</h1>
+    {% if version %}<p>2026 Semester Two Timetable · Version {{ version.version_number }} · <span class="badge {{ version.status|lower }}">{{ version.status }}</span></p>{% endif %}
+  </div>
+  {% if version %}
+  <div class="actions">
+    <a class="btn" href="{{ url_for('admin_validate', version_id=version.version_id) }}">Validate</a>
+    <a class="btn" href="{{ url_for('admin_export', version_id=version.version_id, fmt='xlsx') }}">Excel</a>
+    <a class="btn" href="{{ url_for('admin_export', version_id=version.version_id, fmt='pdf') }}">PDF</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if versions %}
+<form method="get" class="card compact spu-filter-form">
+  <div class="spu-filter-grid">
+    <label>Version
+      <select name="version_id">
+        {% for v in versions %}<option value="{{ v.version_id }}" {% if version and v.version_id == version.version_id %}selected{% endif %}>V{{ v.version_number }} — {{ v.status }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Faculty
+      <select name="faculty_id"><option value="">All</option>{% for x in filter_options.faculties %}<option value="{{x.faculty_id}}" {% if filters.faculty_id == x.faculty_id %}selected{% endif %}>{{x.faculty_code}}</option>{% endfor %}</select>
+    </label>
+    <label>Programme
+      <select name="programme_id"><option value="">All</option>{% for x in filter_options.programmes %}<option value="{{x.programme_id}}" {% if filters.programme_id == x.programme_id %}selected{% endif %}>{{x.programme_code}}</option>{% endfor %}</select>
+    </label>
+    <label>Year
+      <select name="year_level"><option value="">All</option>{% for x in filter_options.years %}<option value="{{x.year_level}}" {% if filters.year_level == x.year_level %}selected{% endif %}>{{x.year_level}}</option>{% endfor %}</select>
+    </label>
+    <label>Module
+      <select name="module_id"><option value="">All</option>{% for x in filter_options.modules %}<option value="{{x.module_id}}" {% if filters.module_id == x.module_id %}selected{% endif %}>{{x.module_code}}</option>{% endfor %}</select>
+    </label>
+    <label>Lecturer
+      <select name="staff_id"><option value="">All</option>{% for x in filter_options.lecturers %}<option value="{{x.staff_id}}" {% if filters.staff_id == x.staff_id %}selected{% endif %}>{{x.first_name}} {{x.last_name}}</option>{% endfor %}</select>
+    </label>
+    <label>Venue
+      <select name="room_id"><option value="">All</option>{% for x in filter_options.rooms %}<option value="{{x.room_id}}" {% if filters.room_id == x.room_id %}selected{% endif %}>{{x.room_name}}</option>{% endfor %}</select>
+    </label>
+    <label>Day
+      <select name="day"><option value="">All</option>{% for x in filter_options.days %}<option value="{{x.value}}" {% if filters.day == x.value %}selected{% endif %}>{{x.label}}</option>{% endfor %}</select>
+    </label>
+  </div>
+  <div class="actions" style="margin-top:10px">
+    <button class="btn primary" type="submit">Apply filters</button>
+    <a class="btn" href="{{ url_for('timetable', version_id=version.version_id if version else None) }}">Clear filters</a>
+  </div>
+</form>
+{% endif %}
+
+{% if version %}
+<div class="card workflow-toolbar">
+  <div class="workflow-tool"><strong>Generate & Validate</strong><div class="actions"><form method="post" action="{{ url_for('admin_generate') }}" onsubmit="return confirm('Generate a new timetable draft?');"><button class="btn small">Generate new draft</button></form><a class="btn small" href="{{ url_for('admin_validate', version_id=version.version_id) }}">Validate</a></div></div>
+  <div class="workflow-tool"><strong>Edit & Lock</strong><span>Use the class controls below to move, Lock or Unlock sessions.</span></div>
+  <div class="workflow-tool"><strong>Workflow</strong><div class="workflow-status-path"><span>DRAFT</span><span>IN_REVIEW</span><span>CHANGES_REQUESTED</span><span>APPROVED</span><span>PUBLISHED</span></div><div class="actions">{% if version.status in ['DRAFT','CHANGES_REQUESTED'] %}<form method="post" action="{{ url_for('admin_submit_review', version_id=version.version_id) }}" onsubmit="return confirm('Send this validated timetable to the assigned reviewer?');"><button class="btn small">Send to review</button></form>{% elif version.status == 'IN_REVIEW' %}<a class="btn small" href="{{ url_for('review_centre') }}">Open Review Centre</a>{% elif version.status == 'APPROVED' %}<a class="btn small" href="{{ url_for('review_centre') }}">Review Centre</a><form method="post" action="{{ url_for('admin_publish_approved', version_id=version.version_id) }}" onsubmit="return confirm('Publish this approved timetable? Students and lecturers will be notified after validation passes.');"><button class="btn primary small">Publish approved timetable</button></form>{% else %}<a class="btn small" href="{{ url_for('review_centre') }}">Review Centre</a>{% endif %}</div></div>
+  <div class="workflow-tool"><strong>Export</strong><div class="actions"><a class="btn small" href="{{ url_for('admin_export', version_id=version.version_id, fmt='xlsx') }}">Excel</a><a class="btn small" href="{{ url_for('admin_export', version_id=version.version_id, fmt='pdf') }}">PDF</a></div></div>
+</div>
+{% endif %}
+
+{% if campus_grid and campus_grid.days %}
+  {% for day_section in campus_grid.days %}
+  <section class="spu-day-section card">
+    <div class="spu-timetable-title">2026 Semester Two Timetable</div>
+    <div class="spu-day-strip">{{ day_section.day|upper }}</div>
+    <div class="spu-grid-scroll">
+      <table class="spu-campus-grid" style="border-collapse:collapse;min-width:1200px">
+        <thead>
+          <tr class="spu-period-row">
+            <th rowspan="2" style="border:1px solid #000">VENUE</th>
+            <th rowspan="2" style="border:1px solid #000">CAPACITY</th>
+            {% for period in campus_grid.periods %}<th style="border:1px solid #000">{{ period.period_number }}</th>{% endfor %}
+          </tr>
+          <tr class="spu-time-row">
+            {% for period in campus_grid.periods %}<th style="border:1px solid #000">{{ period.start_time }}-{{ period.end_time }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for venue in day_section.venues %}
+          <tr>
+            <th class="spu-venue" style="border:1px solid #000">{{ venue.room_name }}</th>
+            <td class="spu-capacity" style="border:1px solid #000">{{ venue.capacity }}</td>
+            {% for p in range(1,11) %}
+            <td class="spu-period-cell" style="border:1px solid #000;background:#fff">
+              {% for r in venue.cells[p] %}
+              <div class="spu-class-cell{% if r.is_locked %} is-locked{% endif %}" style="background:{{ r.colour_hex }}" title="{{ r.module_name }} · {{ r.section_name }} · {{ r.lecturers }}">
+                <strong>{{ r.module_code }}</strong>{% if r.student_count %} <small>({{ r.student_count }})</small>{% endif %}
+                {% if version.status in ['DRAFT','CHANGES_REQUESTED','APPROVED'] %}
+                <a class="spu-cell-edit" href="{{ url_for('timetable', version_id=version.version_id, faculty_id=filters.get('faculty_id'), programme_id=filters.get('programme_id'), year_level=filters.get('year_level'), module_id=filters.get('module_id'), staff_id=filters.get('staff_id'), group_id=filters.get('group_id'), room_id=filters.get('room_id'), day=filters.get('day'), edit_entry=r.entry_id) }}">Edit class</a>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% else %}
+          <tr><td colspan="12" class="empty-state">No venues match the selected filters.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endfor %}
+{% else %}
+<div class="card"><p>No timetable entries to show.</p></div>
+{% endif %}
+
+{% if edit_entry %}
+<aside class="card timetable-edit-drawer" id="edit-class">
+  <div class="edit-drawer-head"><div><span class="eyebrow">Direct class editor</span><h2>{{edit_entry.module_code}} · Edit class</h2><p>{{edit_entry.faculty_name}} ({{edit_entry.faculty_code}}) · {{edit_entry.session_type}}</p></div><a class="drawer-close" href="{{ url_for('timetable', version_id=version.version_id, faculty_id=filters.get('faculty_id'), programme_id=filters.get('programme_id'), year_level=filters.get('year_level'), module_id=filters.get('module_id'), staff_id=filters.get('staff_id'), room_id=filters.get('room_id'), day=filters.get('day')) }}">×</a></div>
+  <div class="edit-context-strip"><span>{{edit_entry.student_count}} students</span><span>{{edit_entry.section_name}}</span><span>{{edit_entry.day_of_week}} P{{edit_entry.start_period}}–P{{edit_entry.start_period+edit_entry.duration_slots-1}}</span><span>{{edit_entry.room_name}}</span></div>
+  {% if version.status in ['DRAFT','CHANGES_REQUESTED','APPROVED'] %}
+    {% if edit_entry.is_locked %}<div class="info-banner"><strong>Locked class.</strong> Unlock it before changing lecturer, venue or time.</div>{% endif %}
+    <form method="post" action="{{ url_for('admin_edit_entry', entry_id=edit_entry.entry_id) }}" class="direct-edit-form">
+      <input type="hidden" name="next" value="{{ request.full_path }}">
+      <label>Lecturer <select name="staff_id" {% if edit_entry.is_locked %}disabled{% endif %}>{% for x in edit_lecturers %}<option value="{{x.staff_id}}" {% if edit_entry.staff and edit_entry.staff[0].staff_id==x.staff_id %}selected{% endif %}>{{x.staff_number}} · {{x.first_name}} {{x.last_name}} · {{x.faculty_code}}</option>{% endfor %}</select></label>
+      <label>Venue <select name="room_id" {% if edit_entry.is_locked %}disabled{% endif %}>{% for x in edit_rooms %}<option value="{{x.room_id}}" {% if edit_entry.room_id==x.room_id %}selected{% endif %}>{{x.room_name}} · cap {{x.capacity}}{% if x.faculty_priority==0 %} · faculty preferred{% endif %}</option>{% endfor %}</select></label>
+      <div class="two-col"><label>Day <select name="day" {% if edit_entry.is_locked %}disabled{% endif %}>{% for d in ['Monday','Tuesday','Wednesday','Thursday','Friday'] %}<option {% if d==edit_entry.day_of_week %}selected{% endif %}>{{d}}</option>{% endfor %}</select></label><label>Start period <input name="start_period" type="number" min="1" max="10" value="{{edit_entry.start_period}}" {% if edit_entry.is_locked %}disabled{% endif %}></label></div>
+      <div class="actions"><button class="btn primary" {% if edit_entry.is_locked %}disabled{% endif %}>Save Changes</button><a class="btn" href="{{ url_for('manual_timetabling', version_id=version.version_id, faculty_id=edit_entry.faculty_id, module_id=edit_entry.module_id, entry_id=edit_entry.entry_id) }}">Open in Manual Timetabling</a></div>
+    </form>
+    <form method="post" action="{{ url_for('admin_entry_lock', entry_id=edit_entry.entry_id) }}" class="inline-form"><input type="hidden" name="next" value="{{request.full_path}}"><input type="hidden" name="locked" value="{{0 if edit_entry.is_locked else 1}}"><button class="btn small">{{'Unlock class' if edit_entry.is_locked else 'Lock class'}}</button></form>
+    <div class="drawer-suggestions"><h3>Smart Suggestions</h3>{% for x in edit_suggestions %}<div class="suggestion-card"><strong>{{x.quality}}</strong><span>{{x.day}} · P{{x.start_period}}–P{{x.end_period}} · {{x.room_name}}</span><small>Capacity {{x.capacity}} / {{x.students}} students{% if x.faculty_preferred %} · Faculty-preferred{% endif %}</small><form method="post" action="{{url_for('admin_edit_entry',entry_id=edit_entry.entry_id)}}"><input type="hidden" name="next" value="{{request.full_path}}"><input type="hidden" name="day" value="{{x.day}}"><input type="hidden" name="start_period" value="{{x.start_period}}"><input type="hidden" name="room_id" value="{{x.room_id}}">{% if edit_entry.staff %}<input type="hidden" name="staff_id" value="{{edit_entry.staff[0].staff_id}}">{% endif %}<button class="btn small">Use suggestion</button></form></div>{% else %}<p class="muted">No alternative is shown while the class is locked, or no better hard-valid placement is available.</p>{% endfor %}</div>
+  {% else %}
+    <div class="info-banner">This {{version.status}} timetable is read-only. Create or return to an editable draft to make changes.</div>
+  {% endif %}
+</aside>
+{% endif %}
+
+{% if version and rows and version.status == 'DRAFT' %}
+<details class="card admin-class-controls">
+  <summary><strong>Advanced table controls</strong> · most edits are faster from the Edit class button above</summary>
+  <div class="table-card" style="margin-top:12px">
+    <table>
+      <thead><tr><th>Day</th><th>P</th><th>Module</th><th>Venue</th><th>Section</th><th>Lock</th><th>Move</th></tr></thead>
+      <tbody>{% for r in rows %}
+      <tr>
+        <td>{{r.day_of_week}}</td><td>{{r.period_number}}</td><td>{{r.module_code}}</td><td>{{r.room_name}}</td><td>{{r.section_name}} {% if r.is_locked %}<span class="badge review is-locked">Locked</span>{% endif %}</td>
+        <td><form method="post" action="{{ url_for('admin_lock', part_id=r.part_id) }}"><input type="hidden" name="version_id" value="{{version.version_id}}"><input type="hidden" name="locked" value="{{0 if r.is_locked else 1}}"><button class="btn small">{{'Unlock' if r.is_locked else 'Lock'}}</button></form></td>
+        <td><form method="post" action="{{ url_for('admin_move', part_id=r.part_id) }}" class="move-form"><input type="hidden" name="version_id" value="{{version.version_id}}"><select name="day">{% for d in ['Monday','Tuesday','Wednesday','Thursday','Friday'] %}<option {% if d==r.day_of_week %}selected{% endif %}>{{d}}</option>{% endfor %}</select><input type="number" name="period" min="1" max="10" value="{{r.period_number}}"><select name="room_id"><option value="">Keep room</option>{% for room in rooms %}<option value="{{room.room_id}}">{{room.room_name}}</option>{% endfor %}</select><button class="btn small">Move</button></form></td>
+      </tr>{% endfor %}</tbody>
+    </table>
+  </div>
+</details>
+{% endif %}
+{% endblock %}

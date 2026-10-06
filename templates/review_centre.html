@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Review Centre · SPU{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Review Centre</h1><p>Formal timetable review, feedback, correction and approval.</p></div>{% if review %}<span class="badge {{review.status|lower}}">{{review.status}}</span>{% endif %}</div>
+<div class="review-layout">
+  <aside class="card review-queue"><h2>Review queue</h2>{% for item in reviews %}<a class="review-queue-item {% if review and item.review_id==review.review_id %}is-selected{% endif %}" href="{{url_for('review_centre',review_id=item.review_id)}}"><strong>V{{item.version_number}} · {{item.status}}</strong><span>{{item.academic_year}} Semester {{item.semester_number}}</span><span>Reviewer: {{item.reviewer_username or 'Unassigned'}}</span>{% if item.unresolved_comments %}<span class="feedback-count">{{item.unresolved_comments}} unresolved</span>{% endif %}</a>{% else %}<p class="muted">No timetable is waiting in your review queue.</p>{% endfor %}</aside>
+  <main class="review-main">
+  {% if review %}
+    <section class="card review-summary"><div class="section-heading"><div><h2>Timetable V{{review.version_number}}</h2><p>Submitted by {{review.submitted_by}} · Reviewer {{review.reviewer_username or 'Unassigned'}} · {{review.submitted_at}}</p></div></div>
+      <div class="review-stats"><span>Status <strong>{{review.status}}</strong></span><span>Validation <strong>{{validation.total if validation else '—'}} hard violations</strong></span><span>Feedback <strong>{{review.unresolved_comments}} unresolved</strong></span></div>
+    </section>
+
+    <section class="card"><h2>Feedback</h2>
+      {% if current_user.role == 'REVIEWER' and review.status == 'IN_REVIEW' %}
+      <form method="post" action="{{url_for('review_add_comment',review_id=review.review_id)}}" class="review-comment-form"><h3>Add General Comment</h3><textarea name="comment_text" required placeholder="Feedback about the whole timetable"></textarea><button class="btn small">Add General Comment</button></form>
+      <form method="post" action="{{url_for('review_add_comment',review_id=review.review_id)}}" class="review-comment-form"><h3>Add Class Comment</h3><select name="entry_id" required><option value="">Choose class</option>{% for row in review_rows %}<option value="{{row.entry_id}}">{{row.module_code}} · {{row.day_of_week}} P{{row.period_number}} · {{row.room_name}}</option>{% endfor %}</select><textarea name="comment_text" required placeholder="What should change for this class?"></textarea><button class="btn small">Add Class Comment</button></form>
+      {% endif %}
+      <div class="review-comments">{% for comment in review.comments %}<article class="review-comment {% if comment.is_resolved %}is-resolved{% endif %}"><header><strong>{{comment.author_username}}</strong><span>{{comment.created_at}}</span>{% if comment.entry_id %}<span class="context-pill">{{comment.module_code}} · {{comment.day_of_week}} P{{comment.period_number}}</span>{% else %}<span class="context-pill">General</span>{% endif %}</header><p>{{comment.comment_text}}</p><div class="actions">{% if current_user.role == 'ADMIN' and comment.entry_id %}<a class="btn small" href="{{url_for('timetable',version_id=review.version_id,edit_entry=comment.entry_id)}}">Edit class</a>{% endif %}{% if not comment.is_resolved %}<form method="post" action="{{url_for('review_resolve_comment',comment_id=comment.comment_id)}}"><input type="hidden" name="review_id" value="{{review.review_id}}"><button class="btn small">Resolve feedback</button></form>{% else %}<span class="badge published">Resolved</span>{% endif %}</div></article>{% else %}<p class="muted">No feedback has been added yet.</p>{% endfor %}</div>
+    </section>
+
+    {% if current_user.role == 'REVIEWER' and review.status == 'IN_REVIEW' %}
+    <section class="card review-decision"><h2>Reviewer decision</h2><div class="review-decision-grid"><form method="post" action="{{url_for('review_request_changes',review_id=review.review_id)}}"><label>Request Changes<textarea name="summary" required placeholder="Explain what the administrator must correct"></textarea></label><button class="btn">Request Changes</button></form><form method="post" action="{{url_for('review_approve',review_id=review.review_id)}}" onsubmit="return confirm('Approve this timetable after checking all feedback is resolved?');"><label>Approval note<textarea name="summary" placeholder="Optional approval note"></textarea></label><button class="btn primary">Approve</button></form></div></section>
+    {% endif %}
+    {% if current_user.role == 'ADMIN' %}
+    <section class="card"><h2>Administrator actions</h2><div class="actions">{% if review.version_status == 'CHANGES_REQUESTED' %}<a class="btn" href="{{url_for('timetable',version_id=review.version_id)}}">Open timetable corrections</a><form method="post" action="{{url_for('admin_resubmit_review',version_id=review.version_id)}}"><button class="btn primary">Resubmit for Review</button></form>{% elif review.version_status == 'APPROVED' %}<form method="post" action="{{url_for('admin_publish_approved',version_id=review.version_id)}}" onsubmit="return confirm('Publish this approved timetable?');"><button class="btn primary">Publish approved timetable</button></form>{% endif %}</div></section>
+    {% endif %}
+
+    <details class="card review-history"><summary><strong>Review history</strong></summary><p>Decision: {{review.decision_summary or 'No decision note yet.'}}</p><p>Submitted {{review.submitted_at}}{% if review.decided_at %} · Decision {{review.decided_at}}{% endif %}</p></details>
+
+    {% if review_grid %}<details class="card"><summary><strong>Timetable preview</strong></summary>{% for day_section in review_grid.days %}<div class="review-preview-day"><h3>{{day_section.day}}</h3><p>{{day_section.venues|length}} venues in this review preview.</p></div>{% endfor %}</details>{% endif %}
+  {% else %}<div class="card empty-state">No review selected.</div>{% endif %}
+  </main>
+</div>
+{% endblock %}

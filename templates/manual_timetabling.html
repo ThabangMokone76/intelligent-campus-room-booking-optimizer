@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Manual Timetabling · SPU{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Manual Timetabling</h1>
+    <p>Guided, constraint-aware editing for the SPU campus timetable.</p>
+  </div>
+  {% if version %}<span class="badge {{ version.status|lower }}">{{ version.status }}</span>{% endif %}
+</div>
+
+<form method="get" class="card manual-context-card" id="manual-context-form">
+  <div class="manual-context-heading">
+    <strong>Working in:</strong>
+    {% if faculty %}<span class="faculty-context-badge" style="border-left-color:{{ faculty.colour_hex }}">{{ faculty.faculty_name }} ({{ faculty.faculty_code }})</span>
+    {% else %}<span class="muted">Choose a faculty to begin</span>{% endif %}
+  </div>
+  <div class="manual-context-grid">
+    <label>Version
+      <select name="version_id" id="version_id">
+        {% for v in versions %}<option value="{{v.version_id}}" {% if version and v.version_id==version.version_id %}selected{% endif %}>V{{v.version_number}} — {{v.status}}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Faculty
+      <select name="faculty_id" id="faculty_id"><option value="">Choose faculty</option>{% for x in faculties %}<option value="{{x.faculty_id}}" {% if selected.faculty_id==x.faculty_id %}selected{% endif %}>{{x.faculty_code}} — {{x.faculty_name}}</option>{% endfor %}</select>
+    </label>
+    <label>Programme
+      <select name="programme_id" id="programme_id"><option value="">Choose programme</option>{% for x in programmes %}<option value="{{x.programme_id}}" {% if selected.programme_id==x.programme_id %}selected{% endif %}>{{x.programme_code}} — {{x.programme_name}}</option>{% endfor %}</select>
+    </label>
+    <label>Year
+      <select name="year_level" id="year_level"><option value="">Choose year</option>{% for x in years %}<option value="{{x}}" {% if selected.year_level==x %}selected{% endif %}>Year {{x}}</option>{% endfor %}</select>
+    </label>
+    <label>Module
+      <select name="module_id" id="module_id"><option value="">Choose module</option>{% for x in modules %}<option value="{{x.module_id}}" {% if selected.module_id==x.module_id %}selected{% endif %}>{{x.module_code}} — {{x.module_name}}</option>{% endfor %}</select>
+    </label>
+    <label>Lecturer
+      <select name="staff_id" id="staff_id"><option value="">All valid lecturers</option>{% for x in lecturers %}<option value="{{x.staff_id}}" {% if selected.staff_id==x.staff_id %}selected{% endif %}>{{x.staff_number}} · {{x.first_name}} {{x.last_name}} · {{x.faculty_code}}</option>{% endfor %}</select>
+    </label>
+    <label>Student Group
+      <select name="group_id" id="group_id"><option value="">All valid groups</option>{% for x in groups %}<option value="{{x.group_id}}" {% if selected.group_id==x.group_id %}selected{% endif %}>{{x.programme_code}} · Year {{x.year_level}} · {{x.section_code}}</option>{% endfor %}</select>
+    </label>
+    <label>Room
+      <select name="room_id" id="room_id"><option value="">All suitable rooms</option>{% for x in ranked_rooms %}<option value="{{x.room_id}}" {% if selected.room_id==x.room_id %}selected{% endif %}>{{x.room_name}} · cap {{x.capacity}}</option>{% endfor %}</select>
+    </label>
+  </div>
+  <div class="actions"><button type="submit" class="btn primary">Show classes</button><a class="btn" href="{{ url_for('manual_timetabling', version_id=version.version_id if version else None) }}">Reset context</a></div>
+</form>
+
+<div class="manual-workspace">
+  <section class="card manual-class-panel">
+    <div class="section-heading"><div><h2>Classes</h2><p>{{ rows|length }} class entries in the current context</p></div></div>
+    <div class="manual-class-list">
+      {% for r in rows %}
+      <a class="manual-class-card {% if selected_entry and selected_entry.entry_id==r.entry_id %}is-selected{% endif %}" href="{{ url_for('manual_timetabling', version_id=version.version_id, faculty_id=selected.faculty_id, programme_id=selected.programme_id, year_level=selected.year_level, module_id=selected.module_id, staff_id=selected.staff_id, group_id=selected.group_id, room_id=selected.room_id, entry_id=r.entry_id) }}">
+        <div><strong>{{r.module_code}}</strong> <span class="faculty-mini">{{r.faculty_code}}</span></div>
+        <span>{{r.day_of_week}} · P{{r.period_number}}–P{{r.period_number+r.duration_slots-1}}</span>
+        <span>{{r.room_name}} · {{r.section_name}}</span>
+        {% if r.is_locked %}<span class="badge review">Locked</span>{% else %}<span class="edit-hint">Edit →</span>{% endif %}
+      </a>
+      {% else %}<div class="empty-state">Choose a faculty/programme/year/module or generate a draft to see classes here.</div>{% endfor %}
+    </div>
+  </section>
+
+  <section class="card smart-placement-panel">
+    <h2>Smart Placement</h2>
+    {% if selected_entry %}
+      <div class="selected-class-summary">
+        <h3>{{selected_entry.module_code}} · {{selected_entry.module_name}}</h3>
+        <p><strong>{{selected_entry.faculty_code}}</strong> · {{selected_entry.session_type}} · {{selected_entry.student_count}} students</p>
+        <p>Current: {{selected_entry.day_of_week}}, P{{selected_entry.start_period}}–P{{selected_entry.start_period+selected_entry.duration_slots-1}} · {{selected_entry.room_name}}</p>
+        {% for g in selected_entry.groups %}<span class="context-pill">{{g.programme_code}} Year {{g.year_level}}</span>{% endfor %}
+      </div>
+      {% if selected_entry.version_status in ['DRAFT','CHANGES_REQUESTED','APPROVED'] %}
+      <form method="post" action="{{ url_for('admin_edit_entry', entry_id=selected_entry.entry_id) }}" class="manual-edit-form">
+        <input type="hidden" name="next" value="{{ request.full_path }}">
+        <label>Lecturer
+          <select name="staff_id" required>
+            {% for x in lecturers %}<option value="{{x.staff_id}}" {% if selected_entry.staff and selected_entry.staff[0].staff_id==x.staff_id %}selected{% endif %}>{{x.staff_number}} · {{x.first_name}} {{x.last_name}} · {{x.faculty_code}}</option>{% endfor %}
+          </select>
+        </label>
+        <label>Room
+          <select name="room_id" required>
+            {% set edit_rooms = ranked_rooms if selected.module_id==selected_entry.module_id else [] %}
+            {% for x in edit_rooms %}<option value="{{x.room_id}}" {% if selected_entry.room_id==x.room_id %}selected{% endif %}>{{x.room_name}} · capacity {{x.capacity}}</option>{% endfor %}
+            {% if not edit_rooms %}<option value="{{selected_entry.room_id}}">{{selected_entry.room_name}} · capacity {{selected_entry.capacity}}</option>{% endif %}
+          </select>
+        </label>
+        <div class="two-col"><label>Day<select name="day">{% for d in ['Monday','Tuesday','Wednesday','Thursday','Friday'] %}<option {% if d==selected_entry.day_of_week %}selected{% endif %}>{{d}}</option>{% endfor %}</select></label><label>Starting period<input type="number" name="start_period" min="1" max="10" value="{{selected_entry.start_period}}"></label></div>
+        <div class="actions"><button class="btn primary">Save Changes</button></div>
+      </form>
+      <form method="post" action="{{ url_for('admin_entry_lock', entry_id=selected_entry.entry_id) }}" class="inline-form"><input type="hidden" name="next" value="{{ request.full_path }}"><input type="hidden" name="locked" value="{{0 if selected_entry.is_locked else 1}}"><button class="btn small">{{'Unlock class' if selected_entry.is_locked else 'Lock class'}}</button></form>
+      {% else %}<div class="info-banner">This version is {{selected_entry.version_status}} and is read-only for manual editing.</div>{% endif %}
+
+      <h3>Recommended alternatives</h3>
+      {% for x in suggestions %}
+      <div class="suggestion-card">
+        <strong>{{x.quality}}</strong><span>{{x.day}} · P{{x.start_period}}–P{{x.end_period}}</span><span>{{x.room_name}}</span>
+        <small>Capacity {{x.capacity}} / Students {{x.students}}</small>
+        <ul><li>✓ Lecturer available</li><li>✓ Student group available</li><li>✓ Room available and compatible</li>{% if x.faculty_preferred %}<li>✓ Faculty-preferred room</li>{% endif %}</ul>
+        <form method="post" action="{{ url_for('admin_edit_entry', entry_id=selected_entry.entry_id) }}"><input type="hidden" name="next" value="{{ request.full_path }}"><input type="hidden" name="day" value="{{x.day}}"><input type="hidden" name="start_period" value="{{x.start_period}}"><input type="hidden" name="room_id" value="{{x.room_id}}">{% if selected_entry.staff %}<input type="hidden" name="staff_id" value="{{selected_entry.staff[0].staff_id}}">{% endif %}<button class="btn small">Use this placement</button></form>
+      </div>
+      {% else %}<p class="muted">Select an editable class to calculate hard-valid alternatives.</p>{% endfor %}
+    {% else %}<div class="empty-state">Select a class on the left. The system will show its current placement and smart alternatives here.</div>{% endif %}
+  </section>
+</div>
+
+<section class="card manual-current-timetable"><div class="section-heading"><div><h2>Current timetable</h2><p>The approved SPU timetable view remains unchanged. Open the full timetable for the venue-by-period grid.</p></div><a class="btn" href="{{ url_for('timetable', version_id=version.version_id if version else None, faculty_id=selected.faculty_id, programme_id=selected.programme_id, year_level=selected.year_level, module_id=selected.module_id, staff_id=selected.staff_id, room_id=selected.room_id) }}">Open filtered SPU timetable</a></div></section>
+
+<script>
+const $ = id => document.getElementById(id);
+function clearSelect(id, label) { const el=$(id); el.innerHTML=''; const o=document.createElement('option'); o.value=''; o.textContent=label; el.appendChild(o); }
+function fillSelect(id, items, valueKey, labelFn, placeholder) { clearSelect(id, placeholder); const el=$(id); items.forEach(x=>{const o=document.createElement('option');o.value=x[valueKey] ?? x;o.textContent=labelFn(x);el.appendChild(o);}); }
+async function loadJSON(url){ const res=await fetch(url); if(!res.ok) return []; return res.json(); }
+$('faculty_id')?.addEventListener('change', async e=>{ clearSelect('programme_id','Choose programme'); clearSelect('year_level','Choose year'); clearSelect('module_id','Choose module'); clearSelect('staff_id','All valid lecturers'); clearSelect('group_id','All valid groups'); clearSelect('room_id','All suitable rooms'); if(e.target.value) fillSelect('programme_id',await loadJSON('/api/context/programmes?faculty_id='+e.target.value),'programme_id',x=>x.programme_code+' — '+x.programme_name,'Choose programme'); });
+$('programme_id')?.addEventListener('change', async e=>{ clearSelect('year_level','Choose year'); clearSelect('module_id','Choose module'); clearSelect('staff_id','All valid lecturers'); clearSelect('group_id','All valid groups'); clearSelect('room_id','All suitable rooms'); if(e.target.value) fillSelect('year_level',await loadJSON('/api/context/years?programme_id='+e.target.value),null,x=>'Year '+x,'Choose year'); });
+$('year_level')?.addEventListener('change', async e=>{ clearSelect('module_id','Choose module'); clearSelect('staff_id','All valid lecturers'); clearSelect('group_id','All valid groups'); clearSelect('room_id','All suitable rooms'); const p=$('programme_id').value; if(p&&e.target.value){ fillSelect('module_id',await loadJSON('/api/context/modules?programme_id='+p+'&year_level='+e.target.value),'module_id',x=>x.module_code+' — '+x.module_name,'Choose module'); fillSelect('group_id',await loadJSON('/api/context/groups?programme_id='+p+'&year_level='+e.target.value),'group_id',x=>x.programme_code+' · Year '+x.year_level+' · '+x.section_code,'All valid groups'); } });
+$('module_id')?.addEventListener('change', async e=>{ clearSelect('staff_id','All valid lecturers'); clearSelect('room_id','All suitable rooms'); if(e.target.value){ fillSelect('staff_id',await loadJSON('/api/context/lecturers?module_id='+e.target.value),'staff_id',x=>x.staff_number+' · '+x.first_name+' '+x.last_name+' · '+x.faculty_code,'All valid lecturers'); fillSelect('room_id',await loadJSON('/api/context/rooms?module_id='+e.target.value+'&expected_students=0'),'room_id',x=>x.room_name+' · cap '+x.capacity,'All suitable rooms'); } });
+</script>
+{% endblock %}

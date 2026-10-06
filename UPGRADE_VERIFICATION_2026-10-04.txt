@@ -1,0 +1,43 @@
+SOL PLAATJE UNIVERSITY TIMETABLE OPTIMIZER
+GUIDED MANUAL TIMETABLING + REVIEW WORKFLOW UPGRADE
+
+Final verification date: 2026-10-04
+Git implementation HEAD: 48384d6
+
+Automated test suite: 131 tests passed, 0 failures.
+Final system check: PASS.
+Python compile check: PASS.
+
+Verified dataset/system state:
+- Synthetic students: 4001
+- Synthetic lecturers: 56
+- Registrations: 12681
+- Teaching rooms: 85
+- Modules: 166
+- Offerings: 166
+- Scheduled parts: 166
+- Hard violations: 0
+
+Verified upgrades:
+- Existing SPU logo, branding, timetable grid and Period 6 12:45-13:20 preserved.
+- Canonical faculty colours: NAS green, EMS purple, Education gold/yellow, Humanities orange.
+- Faculty-first cascading manual timetable context.
+- Lecturer choices restricted to correct faculty by default, with explicit cross-faculty permissions.
+- Faculty/data-integrity audit for lecturer-module assignments.
+- Direct Edit class action on editable timetable cells.
+- Guided Manual Timetabling workspace.
+- Hard-valid CSP-ranked Smart Placement suggestions.
+- Explainable clash/capacity/faculty validation messages.
+- REVIEWER role and Review Centre.
+- General and class-specific feedback.
+- Request Changes, Resubmit, Approve and admin Publish workflow.
+- Workflow states: DRAFT, IN_REVIEW, CHANGES_REQUESTED, APPROVED, PUBLISHED.
+- Approval fingerprint prevents publishing changed content without re-review.
+- Student and lecturer published-only views preserved.
+- PDF/XLSX exports verified with canonical faculty colour logic.
+
+Demo review account:
+- Username: reviewer
+- Password: reviewer123
+
+Final check: PASS

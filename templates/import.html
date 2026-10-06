@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Import Centre</h1>
+<div class="card">
+  <form method="post" enctype="multipart/form-data" class="form-grid">
+    <label>Dataset<select name="dataset"><option value="rooms">Rooms</option><option value="staff">Staff</option><option value="modules">Modules</option><option value="student_groups">Student groups</option><option value="offerings">Module offerings + sessions</option></select></label>
+    <label>CSV or Excel<input type="file" name="file" accept=".csv,.xlsx" required></label>
+    <button class="btn primary">Preview import</button>
+  </form>
+</div>
+{% if preview %}
+<div class="card">
+  <h2>Preview</h2>
+  <p>{{ preview.rows|length }} data row(s).</p>
+  {% if preview.errors %}<div class="flash error"><strong>Errors</strong><ul>{% for e in preview.errors %}<li>{{e}}</li>{% endfor %}</ul></div>{% endif %}
+  {% if preview.warnings %}<div class="flash"><ul>{% for w in preview.warnings %}<li>{{w}}</li>{% endfor %}</ul></div>{% endif %}
+  {% if preview.valid %}<form method="post" action="{{ url_for('admin_import_commit') }}"><input type="hidden" name="preview_json" value='{{ preview_json|e }}'><button class="btn primary">Commit import</button></form>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

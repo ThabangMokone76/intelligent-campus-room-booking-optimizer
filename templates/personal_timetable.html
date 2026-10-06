@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">SOL PLAATJE UNIVERSITY</p>
+    <h1>{{ 'My Teaching Timetable' if current_user.role == 'LECTURER' else 'My Timetable' }}</h1>
+    {% if version %}<p>Published Version {{ version.version_number }} · <span class="badge published">PUBLISHED</span></p>{% endif %}
+  </div>
+  {% if version %}<div class="page-actions"><a class="btn" href="{{ url_for('my_timetable_export', fmt='pdf') }}">Download PDF</a><a class="btn secondary" href="{{ url_for('my_timetable_export', fmt='xlsx') }}">Download Excel</a></div>{% endif %}
+</div>
+{% if not version %}
+<div class="card"><p>No published timetable is available yet.</p></div>
+{% else %}
+<div class="legend card compact">
+  <strong>Faculty colours</strong>
+  <span><i style="background:#f6b221"></i>Education</span>
+  <span><i style="background:#7C3AED"></i>Economic &amp; Management Sciences</span>
+  <span><i style="background:#D97706"></i>Humanities</span>
+  <span><i style="background:#059669"></i>Natural &amp; Applied Sciences</span>
+</div>
+<div class="weekly-wrap card">
+<table class="weekly-grid">
+  <thead><tr><th>Period</th>{% for day in ['Monday','Tuesday','Wednesday','Thursday','Friday'] %}<th>{{day}}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for p in range(1,11) %}
+  <tr><th>P{{p}}</th>
+    {% for day in ['Monday','Tuesday','Wednesday','Thursday','Friday'] %}
+    <td>
+      {% for r in grid[day][p] %}
+      <div class="timetable-event" style="--faculty-colour: {{r.colour_hex}}">
+        <strong>{{r.module_code}}</strong>
+        <span>{{r.module_name}}</span>
+        <small>{{r.start_time}}–{{r.end_time}}</small>
+        <small>Venue: {{r.room_name}}</small>
+        {% if current_user.role == 'STUDENT' %}<small>Lecturer: {{r.lecturers}}</small>{% else %}<small>Group: {{r.section_name}}</small>{% endif %}
+        <em>{{r.faculty_code}} · {{r.session_type}}</em>
+      </div>
+      {% endfor %}
+    </td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+{% endblock %}

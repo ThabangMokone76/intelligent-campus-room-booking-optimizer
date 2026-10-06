@@ -1,0 +1,2 @@
+module_code,expected_students,groups,staff_numbers,session_type,sessions_per_week,duration_slots,required_room_type,can_split_duration
+CMP299,80,BCOMP:2,CS099,Lecture,2,2,Lecture Room,1

@@ -1,0 +1,86 @@
+room_code,room_name,building_code,capacity,room_type,faculty_code,is_shared
+R001,Aud 1 (001),SHARED,290,Auditorium,,1
+R002,Aud 2 (006),SHARED,320,Auditorium,,1
+R003,Audi (C005),NAS_MAIN,183,Auditorium,NAS,0
+R004,Audi 1,SHARED,320,Auditorium,,1
+R005,Audi 1 (001),SHARED,320,Auditorium,,1
+R006,Audi 1 (HUM),HUM_MAIN,144,Auditorium,HUM,0
+R007,Audi 2,SHARED,320,Auditorium,,1
+R008,Audi 2 (006),SHARED,320,Auditorium,,1
+R009,Audi 2 (HUM),HUM_MAIN,146,Auditorium,HUM,0
+R010,Audi 3 (C005),NAS_MAIN,183,Auditorium,NAS,0
+R011,Audi 3 (HUM),HUM_MAIN,252,Auditorium,HUM,0
+R012,B A103,SHARED,102,Classroom,,1
+R013,B A111,SHARED,42,Classroom,,1
+R014,B A112,SHARED,42,Classroom,,1
+R015,BA 103,EDU_MAIN,102,Classroom,EDU,0
+R016,BA111,EDU_MAIN,42,Classroom,EDU,0
+R017,BA112,EDU_MAIN,42,Classroom,EDU,0
+R018,C012,EMS_MAIN,56,Classroom,EMS,0
+R019,C013,EMS_MAIN,60,Classroom,EMS,0
+R020,C014,EMS_MAIN,40,Classroom,EMS,0
+R021,C015 Aud,EMS_MAIN,111,Classroom,EMS,0
+R022,C016 Aud,EMS_MAIN,213,Classroom,EMS,0
+R023,C112 Aud,EMS_MAIN,111,Classroom,EMS,0
+R024,C113 Aud,EMS_MAIN,213,Classroom,EMS,0
+R025,C118,EMS_MAIN,60,Classroom,EMS,0
+R026,Classroom 1 (102),SHARED,80,Classroom,,1
+R027,Classroom 1 (313),SHARED,30,Classroom,,1
+R028,Classroom 1 (HUM),HUM_MAIN,80,Classroom,HUM,0
+R029,Classroom 1(313),SHARED,30,Classroom,,1
+R030,Classroom 2 (103),SHARED,80,Classroom,,1
+R031,Classroom 2 (HUM),HUM_MAIN,40,Classroom,HUM,0
+R032,Classroom 2(103),SHARED,80,Classroom,,1
+R033,Classoroom 2(314),SHARED,30,Classroom,,1
+R034,Classroom 3 (104 ),SHARED,80,Classroom,,1
+R035,Classroom 3 (104),SHARED,80,Classroom,,1
+R036,Classroom 3 (HUM),HUM_MAIN,71,Classroom,HUM,0
+R037,Classroom 3(104),SHARED,80,Classroom,,1
+R038,Classroom 4 (105),SHARED,80,Classroom,,1
+R039,Classroom 4 (HUM),HUM_MAIN,66,Classroom,HUM,0
+R040,Classroom 4(105),SHARED,80,Classroom,,1
+R041,Classroom4(105),SHARED,80,Classroom,,1
+R042,EXAM HALL,SHARED,300,Auditorium,,1
+R043,Lecture hall 1 (003),SHARED,160,Lecture Hall,,1
+R044,Lecture Hall 2 (004),SHARED,160,Lecture Hall,,1
+R045,N001 Chem L,NAS_MAIN,48,Chemistry Lab,NAS,0
+R046,N004 Chem L,NAS_MAIN,80,Chemistry Lab,NAS,0
+R047,N104 Physics L,NAS_MAIN,77,Physics Lab,NAS,0
+R048,N106 Physics L,NAS_MAIN,48,Physics Lab,NAS,0
+R049,N118,NAS_MAIN,84,Classroom,NAS,0
+R050,N201 Geo GIS L,NAS_MAIN,58,GIS Lab,NAS,0
+R051,N204 Bio/Bot/Zoo L,NAS_MAIN,73,Biology Lab,NAS,0
+R052,N205 Bio/Bot/Zoo L,NAS_MAIN,48,Biology Lab,NAS,0
+R053,N217,NAS_MAIN,84,Classroom,NAS,0
+R054,Old library,SHARED,120,Classroom,,1
+R055,Old library (C230),SHARED,120,Classroom,,1
+R056,T004 Aud A,EDU_MAIN,70,Auditorium,EDU,0
+R057,T005 Aud B,EDU_MAIN,70,Auditorium,EDU,0
+R058,T022,EDU_MAIN,72,Classroom,EDU,0
+R059,T023,EDU_MAIN,70,Classroom,EDU,0
+R060,T125,EDU_MAIN,72,Classroom,EDU,0
+R061,T126,EDU_MAIN,68,Classroom,EDU,0
+R062,T205,EDU_MAIN,34,Classroom,EDU,0
+R063,T215,EDU_MAIN,36,Classroom,EDU,0
+R064,T215 Micro Teach L,EDU_MAIN,36,Classroom,EDU,0
+R065,T216,EDU_MAIN,30,Classroom,EDU,0
+R066,T226,EDU_MAIN,42,Classroom,EDU,0
+R067,T232,EDU_MAIN,35,Classroom,EDU,0
+R068,T233,EDU_MAIN,36,Classroom,EDU,0
+R069,T233 L,EDU_MAIN,35,Classroom,EDU,0
+R070,T233 Micro Teach L,EDU_MAIN,36,Classroom,EDU,0
+R071,T305 Nat Sc L,EDU_MAIN,42,Classroom,EDU,0
+R072,T310 Maths L,EDU_MAIN,55,Classroom,EDU,0
+R073,TUT Room 1 (HUM),HUM_MAIN,45,Tutorial Room,HUM,0
+R074,TUT Room 2 (HUM),HUM_MAIN,45,Tutorial Room,HUM,0
+R075,TUT Room 3 (HUM),HUM_MAIN,40,Tutorial Room,HUM,0
+R076,WP12 Consumer L,EDU_MAIN,24,Classroom,EDU,0
+R077,WP17,EDU_MAIN,48,Classroom,EDU,0
+R078,WP26 Phys Sc L,EDU_MAIN,30,Physics Lab,EDU,0
+R079,WP30 Tech L,EDU_MAIN,26,Teaching Lab,EDU,0
+R080,WP5,EDU_MAIN,40,Classroom,EDU,0
+R081,WP5 Geo L,EDU_MAIN,30,Classroom,EDU,0
+R082,Computer Lab 1,NAS_MAIN,80,Computer Lab,NAS,0
+R083,Computer Lab 2,NAS_MAIN,80,Computer Lab,NAS,0
+R084,Network Lab,HUM_MAIN,40,Computer Lab,HUM,0
+R085,Lab-Dev Lab 4,HUM_MAIN,40,Computer Lab,HUM,0

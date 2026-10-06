@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.pyc
+*.db
+*.sqlite
+*.sqlite3
+exports/*.pdf
+exports/*.xlsx
+.pytest_cache/
+.DS_Store
+.worktrees/
+
+data/generated_credentials*
+.env
+*.env
+
+SAMPLE_LOGINS.txt
+
+TNU Timetable System.vbs

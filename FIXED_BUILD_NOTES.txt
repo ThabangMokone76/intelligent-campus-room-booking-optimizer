@@ -1,0 +1,28 @@
+TNU TIMETABLE SYSTEM - FIXED BUILD
+
+Root cause found:
+The uploaded project created an empty SQLite schema at startup but did not seed any users.
+Therefore admin/admin123 (and all other demo credentials) were rejected on a fresh extraction.
+
+Fixes included:
+1. Automatic first-run bootstrap for a fresh database.
+2. Preserves populated existing databases; creates demo users only when users are missing.
+3. Bundled pre-seeded database with a published timetable.
+4. Desktop launcher files included.
+5. Regression test added for admin, lecturer and student password hashes.
+
+Verified credentials for this build:
+Admin: admin / admin123
+Lecturer: lecturer / lecturer123
+Student: student / student123
+
+Verification performed:
+- 8 unit/regression tests passed.
+- Timetable validator: 0 hard violations.
+- Latest timetable version: V1 PUBLISHED.
+- FINAL CHECK PASSED.
+
+Important limitation of the uploaded source:
+This source code does not contain individual synthetic student records/accounts. Its schema models
+student groups, and its demo authentication supports one student account and one lecturer account.
+The earlier claimed 4001-individual-student build is not present in the ZIP that was uploaded.

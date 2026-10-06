@@ -1,0 +1,23 @@
+MERGED SYNTHETIC BUILD
+======================
+
+Purpose: daily Monday-Friday academic teaching timetable only.
+Exam timetable-derived CSV data is reference/input for realistic module/programme relationships; there is no exam scheduling subsystem.
+
+Normal startup restores/uses the bundled synthetic academic population and prevents the empty-user database problem that caused the earlier invalid-login failure.
+
+Verified in the build environment:
+- 25 backend tests: PASS
+- students: 4001
+- lecturers: 56
+- registrations: 12681
+- rooms: 85
+- modules/offerings: 166
+- scheduled parts: 166
+- hard violations: 0
+- admin/student/lecturer password checks: PASS
+- personal timetable filtering: PASS
+- PDF/XLSX export: PASS
+
+Windows-only item that still requires a local smoke test after extraction:
+- PyWebView desktop window launch (TNU Timetable System.vbs)

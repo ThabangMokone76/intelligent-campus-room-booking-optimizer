@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if current_user.role == 'ADMIN' %}
+<div class="page-head">
+  <div><p class="eyebrow">SOL PLAATJE UNIVERSITY</p><h1>Admin Dashboard</h1><p>{{ semester.academic_year }} Semester {{ semester.semester_number }} · {{ semester.status }}</p></div>
+  <form method="post" action="{{ url_for('admin_generate') }}" onsubmit="return confirm('Generate a new timetable draft? Existing published timetables will remain available.');"><button class="btn primary">Generate timetable</button></form>
+</div>
+<div class="cards six">
+  <div class="card metric"><span>Students</span><strong>{{ counts.students }}</strong></div>
+  <div class="card metric"><span>Lecturers</span><strong>{{ counts.lecturers }}</strong></div>
+  <div class="card metric"><span>Registrations</span><strong>{{ counts.registrations }}</strong></div>
+  <div class="card metric"><span>Rooms</span><strong>{{ counts.rooms }}</strong></div>
+  <div class="card metric"><span>Modules</span><strong>{{ counts.modules }}</strong></div>
+  <div class="card metric"><span>Class sessions</span><strong>{{ counts.sessions }}</strong></div>
+</div>
+<div class="card"><h2>Current timetable</h2>{% if version %}<p>Version {{ version.version_number }} · <span class="badge {{ version.status|lower }}">{{ version.status }}</span></p><a class="btn" href="{{ url_for('timetable', version_id=version.version_id) }}">Open campus timetable</a>{% else %}<p>No timetable is visible yet.</p>{% endif %}</div>
+<div class="card workflow-lifecycle"><h2>Review lifecycle</h2><p class="muted">DRAFT → IN_REVIEW → CHANGES_REQUESTED / APPROVED → PUBLISHED</p><a class="btn small" href="{{ url_for('review_centre') }}">Open Review Centre</a></div>
+{% if metrics %}<div class="cards five"><div class="card metric"><span>Hard violations</span><strong>{{ metrics.hard_violations }}</strong></div><div class="card metric"><span>Student gaps</span><strong>{{ metrics.student_gaps }}</strong></div><div class="card metric"><span>Lecturer gaps</span><strong>{{ metrics.lecturer_gaps }}</strong></div><div class="card metric"><span>Room utilization</span><strong>{{ metrics.room_utilization }}%</strong></div><div class="card metric"><span>Balance score</span><strong>{{ metrics.balance_score }}</strong></div></div>{% endif %}
+<div class="card"><h2>Recent timetable activity</h2><div class="activity-list">{% for item in recent_activity %}<div class="activity-row"><div><strong>{{ item.title }}</strong><small>{{ item.activity_at }}</small></div>{% if item.recipients %}<span class="badge review">{{ item.recipients }} affected</span>{% endif %}</div>{% else %}<p>No timetable activity yet.</p>{% endfor %}</div></div>
+{% elif current_user.role == 'STUDENT' %}
+<div class="page-head"><div><p class="eyebrow">STUDENT PORTAL</p><h1>Welcome, {{ current_user.username }}</h1><p>Your published academic timetable at Sol Plaatje University.</p></div><a class="btn primary" href="{{ url_for('timetable') }}">My Timetable</a></div>
+{% if personal_context and personal_context.is_visible %}
+<div class="cards two">
+  <div class="card personal-focus"><h2>Today's Classes</h2>{% for r in personal_context.today_classes %}<div class="personal-class"><strong>{{r.module_code}}</strong><span>{{r.start_time}}–{{r.end_time}}</span><small>{{r.room_name}}</small></div>{% else %}<p>No classes scheduled for today.</p>{% endfor %}</div>
+  <div class="card personal-focus"><h2>Next Class</h2>{% if personal_context.next_class %}<div class="next-class"><strong>{{personal_context.next_class.module_code}}</strong><span>{{personal_context.next_class.day_of_week}} · {{personal_context.next_class.start_time}}</span><small>{{personal_context.next_class.room_name}}</small></div>{% else %}<p>No upcoming class in the published week.</p>{% endif %}</div>
+</div>
+<div class="cards two"><div class="card"><h2>My Modules</h2><div class="tag-list">{% for m in personal_context.modules %}<span class="tag">{{m.module_code}}</span>{% endfor %}</div></div><div class="card"><h2>Venues</h2><div class="tag-list">{% for v in personal_context.venues %}<span class="tag">{{v.room_name}}</span>{% endfor %}</div></div></div>
+{% else %}<div class="card"><p>No published timetable is available yet.</p></div>{% endif %}
+{% elif current_user.role == 'LECTURER' %}
+<div class="page-head"><div><p class="eyebrow">LECTURER PORTAL</p><h1>Welcome, {{ current_user.username }}</h1><p>Your assigned teaching timetable at Sol Plaatje University.</p></div><a class="btn primary" href="{{ url_for('timetable') }}">My Teaching Timetable</a></div>
+{% if personal_context and personal_context.is_visible %}
+<div class="cards two">
+  <div class="card personal-focus"><h2>Today's Teaching</h2>{% for r in personal_context.today_classes %}<div class="personal-class"><strong>{{r.module_code}}</strong><span>{{r.start_time}}–{{r.end_time}}</span><small>{{r.section_name}} · {{r.room_name}}</small></div>{% else %}<p>No teaching scheduled for today.</p>{% endfor %}</div>
+  <div class="card personal-focus"><h2>Next Teaching Session</h2>{% if personal_context.next_class %}<div class="next-class"><strong>{{personal_context.next_class.module_code}}</strong><span>{{personal_context.next_class.day_of_week}} · {{personal_context.next_class.start_time}}</span><small>{{personal_context.next_class.section_name}} · {{personal_context.next_class.room_name}}</small></div>{% else %}<p>No upcoming teaching session in the published week.</p>{% endif %}</div>
+</div>
+<div class="cards two"><div class="card"><h2>Assigned Modules</h2><div class="tag-list">{% for m in personal_context.modules %}<span class="tag">{{m.module_code}}</span>{% endfor %}</div></div><div class="card"><h2>Student Groups &amp; Venues</h2><div class="tag-list">{% for g in personal_context.groups %}<span class="tag">{{g.section_name}}</span>{% endfor %}{% for v in personal_context.venues %}<span class="tag venue">{{v.room_name}}</span>{% endfor %}</div></div></div>
+{% else %}<div class="card"><p>No published timetable is available yet.</p></div>{% endif %}
+{% endif %}
+{% endblock %}

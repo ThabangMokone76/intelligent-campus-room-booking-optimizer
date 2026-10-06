@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div><h1>Synthetic University Data</h1><p>Undergraduate demo population generated from the approved timetable sources.</p></div><a class="btn primary" href="{{ url_for('admin_synthetic_credentials') }}">Download login credentials</a></div>
+<div class="cards six">
+  <div class="card metric"><span>Students</span><strong>{{stats.students}}</strong></div>
+  <div class="card metric"><span>Lecturers</span><strong>{{stats.lecturers}}</strong></div>
+  <div class="card metric"><span>Registrations</span><strong>{{stats.registrations}}</strong></div>
+  <div class="card metric"><span>Programmes</span><strong>{{stats.programmes}}</strong></div>
+  <div class="card metric"><span>Modules</span><strong>{{stats.modules}}</strong></div>
+  <div class="card metric"><span>Teaching venues</span><strong>{{stats.rooms}}</strong></div>
+</div>
+<div class="card"><h2>Sample student accounts</h2><p>Password rule: <strong>Tnu@ + last four digits of student number</strong>.</p><table><thead><tr><th>Student no.</th><th>Name</th><th>Email</th><th>Programme</th><th>Year</th><th>Password</th></tr></thead><tbody>{% for s in students %}<tr><td>{{s.student_number}}</td><td>{{s.first_name}} {{s.last_name}}</td><td>{{s.email}}</td><td>{{s.programme_code}}</td><td>{{s.year_level}}</td><td>Tnu@{{s.student_number[-4:]}}</td></tr>{% endfor %}</tbody></table></div>
+<div class="card"><h2>Sample lecturer accounts</h2><p>Password rule: <strong>Tnu@ + last four digits of staff number</strong>.</p><table><thead><tr><th>Staff no.</th><th>Name</th><th>Email</th><th>Faculty</th><th>Password</th></tr></thead><tbody>{% for s in lecturers %}<tr><td>{{s.staff_number}}</td><td>{{s.first_name}} {{s.last_name}}</td><td>{{s.email}}</td><td>{{s.faculty_code}}</td><td>Tnu@{{s.staff_number[-4:]}}</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

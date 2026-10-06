@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Administration</h1><p>Generate, review and publish timetable versions.</p></div>
+  <form method="post" action="{{ url_for('admin_generate') }}" onsubmit="return confirm('Generate a new timetable draft?');"><button class="btn primary">Generate new draft</button></form>
+</div>
+<div class="workflow-groups">
+  <div class="workflow-group"><strong>Generate & Validate</strong><span>Create a draft and run the hard-constraint validator.</span></div>
+  <div class="workflow-group"><strong>Edit & Lock</strong><span>Open a draft to move classes and protect approved placements.</span></div>
+  <div class="workflow-group"><strong>Workflow</strong><span>Move safely from Draft to Review to Published.</span></div>
+  <div class="workflow-group"><strong>Export</strong><span>Download approved timetable outputs from the timetable screen.</span></div>
+</div>
+<div class="card">
+  <h2>Versions</h2>
+  <table>
+    <thead><tr><th>Version</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for v in versions %}
+      <tr>
+        <td>V{{ v.version_number }}</td>
+        <td><span class="badge {{ v.status|lower }}">{{ v.status }}</span></td>
+        <td>{{ v.created_at }}</td>
+        <td class="actions">
+          <a class="btn small" href="{{ url_for('timetable', version_id=v.version_id) }}">Open</a>
+          <a class="btn small" href="{{ url_for('admin_validate', version_id=v.version_id) }}">Validate</a>
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="4">No versions yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

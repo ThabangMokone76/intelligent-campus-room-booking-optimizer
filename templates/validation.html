@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+  <div><p class="eyebrow">QUALITY GATE</p><h1>Validation Centre</h1><p>Version {{ version_id }}</p></div>
+  <a class="btn" href="{{ url_for('timetable', version_id=version_id) }}">Back to timetable</a>
+</div>
+<div class="card metric wide"><span>Total hard violations</span><strong>{{ report['total'] }}</strong></div>
+<div class="cards four">
+  {% for category, count in report['categories'].items() %}
+  <div class="card metric"><span>{{ category|replace('_',' ')|title }}</span><strong>{{ count }}</strong></div>
+  {% endfor %}
+</div>
+<div class="card">
+  <h2>Details</h2>
+  {% if report['items'] %}
+  <ul class="violations">{% for item in report['items'] %}<li><strong>{{ item['category'] }}</strong> — {{ item['message'] }}</li>{% endfor %}</ul>
+  {% else %}
+  <div class="validation-ready"><span class="validation-check">✓</span><div><strong>Timetable valid</strong><p class="success-text">No hard violations. This timetable is publishable.</p></div></div>
+  {% endif %}
+</div>
+{% endblock %}

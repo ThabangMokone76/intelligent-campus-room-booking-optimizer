@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Sign in · Sol Plaatje University Timetable Optimizer{% endblock %}
+{% block content %}
+<section class="spu-login-stage">
+  <div class="spu-login-watermark" aria-hidden="true"></div>
+  <div class="spu-login-branding">
+    <img class="spu-login-logo" src="{{ url_for('static', filename='images/spu-logo.png') }}" alt="Sol Plaatje University logo">
+    <div>
+      <p class="eyebrow">SOL PLAATJE UNIVERSITY</p>
+      <h1>Sol Plaatje University Timetable Optimizer</h1>
+      <p>Campus Academic Timetable and Room Allocation System</p>
+    </div>
+  </div>
+  <div class="login-card card spu-login-card">
+    <div class="spu-login-accent"></div>
+    <h2>Welcome back</h2>
+    <p>Sign in with your university timetable account.</p>
+    <form method="post" class="form-grid one-col">
+      <label>Username<input name="username" autocomplete="username" required autofocus></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="btn primary spu-signin" type="submit">Sign in</button>
+    </form>
+    <small class="spu-login-footnote">Academic timetable scheduling · room allocation · validation</small>
+  </div>
+</section>
+{% endblock %}

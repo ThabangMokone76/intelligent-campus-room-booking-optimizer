@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Sol Plaatje University Timetable Optimizer{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar spu-topbar">
+    <a class="brand spu-brand" href="{{ url_for('dashboard') if current_user else url_for('login') }}">
+      <img class="spu-shell-crest" src="{{ url_for('static', filename='images/spu-crest.png') }}" alt="Sol Plaatje University crest">
+      <span><strong>Sol Plaatje University</strong><small>Timetable Optimizer</small></span>
+    </a>
+    {% if current_user %}
+    <nav class="spu-nav" aria-label="Primary navigation">
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('timetable') }}">Timetable</a>
+      {% if current_user.role == 'ADMIN' %}
+      <a href="{{ url_for('admin') }}">Admin</a>
+      <a href="{{ url_for('manual_timetabling') }}">Manual Timetabling</a>
+      <a href="{{ url_for('review_centre') }}">Review Centre</a>
+      <a href="{{ url_for('admin_data') }}">Data</a>
+      <a href="{{ url_for('admin_synthetic') }}">Synthetic Data</a>
+      <a href="{{ url_for('admin_import') }}">Import</a>
+      {% elif current_user.role == 'REVIEWER' %}
+      <a href="{{ url_for('review_centre') }}">Review Centre</a>
+      {% elif current_user.role == 'LECTURER' %}
+      <a href="{{ url_for('timetable') }}">My Teaching</a>
+      {% elif current_user.role == 'STUDENT' %}
+      <a href="{{ url_for('timetable') }}">My Classes</a>
+      {% endif %}
+      <a class="notification-link" href="{{ url_for('notifications_page') }}">
+        Notifications
+        {% if unread_notifications %}<span class="notification-badge">{{ unread_notifications }}</span>{% endif %}
+      </a>
+      <span class="spu-user-chip">{{ current_user.username }} · {{ current_user.role }}</span>
+      <a class="logout-link" href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+    {% else %}
+    <span class="spu-public-label">Campus Academic Timetable System</span>
+    {% endif %}
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
